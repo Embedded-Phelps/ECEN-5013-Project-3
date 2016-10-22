@@ -22,28 +22,48 @@
 */
 int8_t my_memmove(uint8_t * src, uint8_t * dst, int32_t length){
     uint32_t i;
-    uint8_t * psrc = (uint8_t *) src; 	
-    uint8_t * pdst = (uint8_t *) dst;
+	uint32_t word_length;
+	uint32_t byte_length;
+    uint32_t * psrc; 	
+    uint32_t * pdst;
+	
 	if (length == 0)
         return ERROR;
     if((NULL==src)||(NULL==dst))
-	return ERROR;
-    
-    if ((pdst <= psrc) || (pdst > (psrc+length))){ //forward copy
-	for (i=0;i<length;i++){
-	    *pdst = *psrc;
-	    pdst++;
-	    psrc++;
-	}
+		return ERROR;
+	
+	word_length = length >> 2;
+	byte_length = length % 4;
+	
+    if ((dst <= src) || (dst > (src+length))){ //forward copy
+		psrc = (uint32_t *) src;
+		pdst = (uint32_t *) dst;
+		for (i=0;i<word_length;i++){
+			*pdst = *psrc;
+			pdst++;
+			psrc++;
+		}
+		for (i=0;i<byte_length;i++){
+			*(uint8_t *)pdst = *(uint8_t *) psrc;
+			((uint8_t *)pdst)++;
+			((uint8_t *)psrc)++;
+		}
     }
-    else{				//backward copy
-        psrc += length-1;
-	pdst += length-1;
-	for (i=0;i<length;i++){
-	    *pdst = *psrc;
-            pdst--;
-	    psrc--;
-	}
+    else{									 //backward copy
+		src += length-4;
+		dst += length-4;
+		psrc = (uint32_t *) src;
+		pdst = (uint32_t *) dst;
+		for (i=0;i<word_length;i++){
+			*pdst = *psrc;
+			pdst--;
+			psrc--;
+		}
+		for (i=0;i<byte_length;i++){
+			*((uint8_t *)pdst+3) = *((uint8_t *)psrc+3);
+			((uint8_t *)pdst)++;
+			((uint8_t *)psrc)++;
+		}
     }
     return SUCCESS;
 }
@@ -82,11 +102,22 @@ int8_t dma_memmove(uint8_t * src, uint8_t * dst, uint32_t length, uint8_t ch){
 */
 int8_t my_memzero(uint8_t * src, uint32_t length){
     uint32_t i;
+	uint32_t word_length;
+	uint32_t byte_length;
+	uint32_t * psrc;
 	if(src == NULL)
         return ERROR;
-    
-    for(i = 0;i < length;i ++)
-        *(src + i) = 0;
+	word_length = length >> 2;
+	byte_length = length % 4;
+    psrc = (uint32_t *) src;
+    for(i = 0;i < word_length; i++){
+        *psrc  = 0;
+		psrc ++;
+	}
+	for(i = 0;i < byte_length; i++){
+		*(uint8_t *)psrc = 0;
+		((uint8_t *)psrc)++;
+	}
     return SUCCESS;
 }
 

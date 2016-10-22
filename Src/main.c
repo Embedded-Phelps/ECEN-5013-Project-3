@@ -1,10 +1,10 @@
 #include "includes.h"
 
 int main(void){
-	uint8_t src[5]="12345";
-	uint8_t dst[5];
-	dma_memmove(src,dst,5,0);
-	dma_memzero(src,5,0);
+	uint8_t src[21]="123456789122323";
+	//uint8_t dst[10]="abcdefghia";
+	//my_memmove(src,dst,10);
+	my_memzero(src,10);
 	return 0;
 	
 	

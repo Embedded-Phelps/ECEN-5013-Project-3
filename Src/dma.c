@@ -13,7 +13,8 @@ uint8_t dma_Init_Mem2mem(uint8_t dma_ch,
 	DMA_DCR_REG(DMA_BASE_PTR, dma_ch) = DMA_DCR_SINC_MASK |					// Enable source increment
 										DMA_DCR_SSIZE(1)  |					// Setting source size (0:32bit/1:8bit/2:16bit)
 										DMA_DCR_DINC_MASK |					// Enable destination increment	
-										DMA_DCR_DSIZE(1)  ;					// setting destination size (0:32bit/1:8bit/2:16bit)
+										DMA_DCR_DSIZE(0)  |					// setting destination size (0:32bit/1:8bit/2:16bit)
+										DMA_DCR_AA_MASK;
 #if DMA_ISR_ENABLE
 	DMA_DCR_REG(DMA_BASE_PTR, dma_ch) |= DMA_DCR_EINT_MASK;					// Enable DMA interrupt
 #endif

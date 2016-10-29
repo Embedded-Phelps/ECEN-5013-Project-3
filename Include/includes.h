@@ -36,20 +36,20 @@ extern "C" {
   Driver header files  
 *********************************************************************************************************/
 #ifndef _BBB
-//	#include "uart.h"
-//	#include "gpio.h"
-//	#include "timer.h"
+	#include "uart.h"
+	#include "gpio.h"
+	#include "timer.h"
 	#include "dma.h"
 #endif
 
 /*********************************************************************************************************
   User's header files 
 *********************************************************************************************************/
-//#include "log.h"
-//#include "data.h"
+#include "log.h"
+#include "data.h"
 #include "memory.h"
-//#include "profiler.h"
-//#include "circbuf.h"
+#include "profiler.h"
+#include "circbuf.h"
 
 
 /*********************************************************************************************************
@@ -66,6 +66,7 @@ extern "C" {
 #define TIME_PER_CYCLE		41.6666666
 
 //#define _BBB									/* uncomment this when building for BBB */
+#define DEBUG
 #ifdef __cplusplus
 }
 #endif

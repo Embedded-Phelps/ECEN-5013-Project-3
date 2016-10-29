@@ -60,9 +60,9 @@ uint8_t * my_ftoa(uint8_t *str, float fdata){
 	
 	uint32_t fdigit=0;
 	
-	int8_t str_float[32];
+	uint8_t str_float[32];
 	uint8_t i=0;
-	int8_t * p = str;
+	uint8_t * p = str;
 	my_memzero(str,32);
 	my_memzero(str_float,32);
 	

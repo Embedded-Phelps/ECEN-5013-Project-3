@@ -40,6 +40,7 @@ extern "C" {
 	#include "gpio.h"
 	#include "timer.h"
 	#include "dma.h"
+	#include "spi.h"
 #endif
 
 /*********************************************************************************************************
@@ -50,20 +51,20 @@ extern "C" {
 #include "memory.h"
 #include "profiler.h"
 #include "circbuf.h"
-
+#include "nRF24L01.h"
 
 /*********************************************************************************************************
   Macro 
 *********************************************************************************************************/
-#define LOG_TEST			1					/* turn on/off logger test */
-#define CIRCBUF_UNITTEST	0					/* turn on/off circular buffer unit test */
-#define TIME_PROFILE		0					/* turn on/off time profiling of a series of functions */
+#define LOG_TEST			(1)					/* turn on/off logger test */
+#define CIRCBUF_UNITTEST	(0)					/* turn on/off circular buffer unit test */
+#define TIME_PROFILE		(0)					/* turn on/off time profiling of a series of functions */
 
-#define SET_LED_RED(x)     TPM2_C0V = (x)		/* Command to set the brightness of the red LED */
-#define SET_LED_GREEN(x)   TPM2_C1V = (x)		/* Command to set the brightness of the green LED */
-#define SET_LED_BLUE(x)    TPM0_C1V = (x)		/* Command to set the brightness of the blue LED */
+#define SET_LED_RED(x)     (TPM2_C0V = (x))		/* Command to set the brightness of the red LED */
+#define SET_LED_GREEN(x)   (TPM2_C1V = (x))		/* Command to set the brightness of the green LED */
+#define SET_LED_BLUE(x)    (TPM0_C1V = (x))		/* Command to set the brightness of the blue LED */
 
-#define TIME_PER_CYCLE		41.6666666
+#define TIME_PER_CYCLE		(41.6666666)
 
 //#define _BBB									/* uncomment this when building for BBB */
 #define DEBUG

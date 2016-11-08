@@ -31,9 +31,9 @@ extern "C" {
 #define PORT_ENABLE_CLK(PTO)        V_PORT_ENABLE_CLK(PTO)
 #define PORT_DISABLE_CLK(PTO)       V_PORT_DISABLE_CLK(PTO)
 
-void led_Gpio_Init(void);
-
-
+extern void led_Gpio_Init(void);
+extern void spi_Gpio_Init(void);
+extern void nrf_Gpio_Init(void);
 #ifdef __cplusplus
 }
 #endif

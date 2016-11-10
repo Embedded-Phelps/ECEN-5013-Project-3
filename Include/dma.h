@@ -12,6 +12,8 @@
 
 #include "includes.h"
 
+#define DMA_ISR_ENABLE		(1)
+
 uint8_t dma_Init_Mem2mem(uint8_t dma_ch, 
 						 uint8_t * source_addr,
 						 uint8_t * destination_addr,

@@ -41,6 +41,7 @@ extern "C" {
 	#include "timer.h"
 	#include "dma.h"
 	#include "spi.h"
+	#include "message.h"
 #endif
 
 /*********************************************************************************************************

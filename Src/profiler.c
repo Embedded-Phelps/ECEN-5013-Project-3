@@ -10,7 +10,13 @@
 #include "includes.h"
 
 #ifndef _BBB
+uint8_t dma_done=0;
 int32_t num_pit_overflow=0;
+
+void DMA0_IRQHandler(void){
+	(DMA_DSR_BCR_REG(DMA_BASE_PTR, 0) |= DMA_DSR_BCR_DONE_MASK);
+	dma_done=1;
+}
 
 void PIT_IRQHandler(void){
     PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;					// Disable PIT Timer
@@ -19,6 +25,306 @@ void PIT_IRQHandler(void){
     PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;					//Enable PIT Timer
 }
 #endif
+
+void Profiling_Memmove(int32_t bytes){
+	uint8_t *source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
+	uint8_t *destination = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
+	uint8_t n;
+	int32_t cycle_avg=0;
+	int32_t cycle=0;
+	int32_t overflow=0;
+	float time_1=0.0;
+	float time_2=0.0;
+	float time_3=0.0;
+	float time_4=0.0;
+	float time_5=0.0;
+	int32_t cycle_1=0;
+	int32_t cycle_2=0;
+	int32_t cycle_3=0;
+	int32_t cycle_4=0;
+	int32_t cycle_5=0;
+	for(n=0;n<3;n++){
+		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+		my_memmove(source, destination, bytes);
+		cycle += PIT_CVAL0;
+		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+		overflow += num_pit_overflow;
+		cycle_avg += cycle;
+		num_pit_overflow=0;
+		cycle=0;
+	}
+	cycle_avg /= 3;
+	overflow /= 3;
+	cycle_1 = cycle_avg + overflow * 24;
+	time_1 = (cycle_avg * TIME_PER_CYCLE) + overflow * 1000;
+	cycle_avg = 0;
+	overflow = 0;
+	
+	for(n=0;n<3;n++){
+		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+		my_memmove_word(source, destination, bytes);
+		cycle += PIT_CVAL0;
+		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+		overflow += num_pit_overflow;
+		cycle_avg += cycle;
+		num_pit_overflow=0;
+		cycle=0;
+	}
+	cycle_avg /= 3;
+	overflow /= 3;
+	cycle_2 = cycle_avg + overflow * 24;
+	time_2 = (cycle_avg * TIME_PER_CYCLE) + overflow * 1000;
+	cycle_avg = 0;
+	overflow = 0;
+	
+	for(n=0;n<3;n++){
+		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+		dma_memmove(source, destination, bytes, 0);
+		while(dma_done==0);
+		cycle += PIT_CVAL0;
+		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+		dma_done=0;
+		overflow += num_pit_overflow;
+		cycle_avg += cycle;
+		num_pit_overflow=0;
+		cycle=0;
+	}
+	cycle_avg /= 3;
+	overflow /= 3;
+	cycle_3 = cycle_avg + overflow * 24;
+	time_3 = (cycle_avg * TIME_PER_CYCLE) + overflow * 1000;
+	cycle_avg = 0;
+	overflow = 0;
+
+	for(n=0;n<3;n++){
+		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+		dma_memmove_word(source, destination, bytes, 0);
+		while(dma_done==0);
+		cycle += PIT_CVAL0;
+		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+		dma_done=0;
+		overflow += num_pit_overflow;
+		cycle_avg += cycle;
+		num_pit_overflow=0;
+		cycle=0;
+	}
+	cycle_avg /= 3;
+	overflow /= 3;
+	cycle_4 = cycle_avg + overflow * 24;
+	time_4 = (cycle_avg * TIME_PER_CYCLE) + overflow * 1000;
+	cycle_avg = 0;
+	overflow = 0;
+	
+	for(n=0;n<3;n++){
+		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+		memmove(source, destination, bytes);
+		cycle += PIT_CVAL0;
+		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+		overflow += num_pit_overflow;
+		cycle_avg += cycle;
+		num_pit_overflow=0;
+		cycle=0;
+	}
+	cycle_avg /= 3;
+	overflow /= 3;
+	cycle_5 = cycle_avg + overflow * 24;
+	time_5 = (cycle_avg * TIME_PER_CYCLE) + overflow * 1000;
+	cycle_avg = 0;
+	overflow = 0;
+	
+	log_Int(" ", bytes);
+	log_Int("	", cycle_1);
+	log_Str(" cycles");
+	log_Int("	", cycle_2);
+	log_Str(" cycles");
+	log_Int("		", cycle_3);
+	log_Str(" cycles");
+	log_Int("	", cycle_4);
+	log_Str(" cycles");
+	log_Int("		 ", cycle_5);
+	log_Str(" cycles");
+	log_Str("\r\n");
+	
+	//log_Str("");
+	log_Float("	", time_1);
+	log_Str(" ns");
+	log_Float("	", time_2);
+	log_Str(" ns");
+	log_Float("		", time_3);
+	log_Str(" ns");
+	log_Float("	", time_4);
+	log_Str(" ns");
+	log_Float("		", time_5);
+	log_Str(" ns");
+	log_Str("\r\n");
+	
+	free(source);
+	free(destination);
+}
+
+void Profiling_Memset(int32_t bytes){
+	uint8_t *source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
+	uint8_t n;
+	int32_t cycle_avg=0;
+	int32_t cycle=0;
+	int32_t overflow=0;
+	float time_1=0.0;
+	float time_2=0.0;
+	float time_3=0.0;
+	float time_4=0.0;
+	float time_5=0.0;
+	int32_t cycle_1=0;
+	int32_t cycle_2=0;
+	int32_t cycle_3=0;
+	int32_t cycle_4=0;
+	int32_t cycle_5=0;
+	for(n=0;n<3;n++){
+		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+		my_memzero(source, bytes);
+		cycle += PIT_CVAL0;
+		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+		overflow += num_pit_overflow;
+		cycle_avg += cycle;
+		num_pit_overflow=0;
+		cycle=0;
+	}
+	cycle_avg /= 3;
+	overflow /= 3;
+	cycle_1 = cycle_avg + overflow * 24;
+	time_1 = (cycle_avg * TIME_PER_CYCLE) + overflow * 1000;
+	cycle_avg = 0;
+	overflow = 0;
+	
+	for(n=0;n<3;n++){
+		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+		my_memzero_word(source, bytes);
+		cycle += PIT_CVAL0;
+		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+		overflow += num_pit_overflow;
+		cycle_avg += cycle;
+		num_pit_overflow=0;
+		cycle=0;
+	}
+	cycle_avg /= 3;
+	overflow /= 3;
+	cycle_2 = cycle_avg + overflow * 24;
+	time_2 = (cycle_avg * TIME_PER_CYCLE) + overflow * 1000;
+	cycle_avg = 0;
+	overflow = 0;
+	
+	for(n=0;n<3;n++){
+		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+		dma_memzero(source, bytes, 0);
+		while(dma_done==0);
+		cycle += PIT_CVAL0;
+		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+		dma_done=0;
+		overflow += num_pit_overflow;
+		cycle_avg += cycle;
+		num_pit_overflow=0;
+		cycle=0;
+	}
+	cycle_avg /= 3;
+	overflow /= 3;
+	cycle_3 = cycle_avg + overflow * 24;
+	time_3 = (cycle_avg * TIME_PER_CYCLE) + overflow * 1000;
+	cycle_avg = 0;
+	overflow = 0;
+
+	for(n=0;n<3;n++){
+		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+		dma_memzero_word(source, bytes, 0);
+		while(dma_done==0);
+		cycle += PIT_CVAL0;
+		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+		dma_done=0;
+		overflow += num_pit_overflow;
+		cycle_avg += cycle;
+		num_pit_overflow=0;
+		cycle=0;
+	}
+	cycle_avg /= 3;
+	overflow /= 3;
+	cycle_4 = cycle_avg + overflow * 24;
+	time_4 = (cycle_avg * TIME_PER_CYCLE) + overflow * 1000;
+	cycle_avg = 0;
+	overflow = 0;
+	
+	for(n=0;n<3;n++){
+		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+		memset(source, 0, bytes);
+		cycle += PIT_CVAL0;
+		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+		overflow += num_pit_overflow;
+		cycle_avg += cycle;
+		num_pit_overflow=0;
+		cycle=0;
+	}
+	cycle_avg /= 3;
+	overflow /= 3;
+	cycle_5 = cycle_avg + overflow * 24;
+	time_5 = (cycle_avg * TIME_PER_CYCLE) + overflow * 1000;
+	cycle_avg = 0;
+	overflow = 0;
+	
+	log_Int(" ", bytes);
+	log_Int("	", cycle_1);
+	log_Str(" cycles");
+	log_Int("	", cycle_2);
+	log_Str(" cycles");
+	log_Int("		", cycle_3);
+	log_Str(" cycles");
+	log_Int("	", cycle_4);
+	log_Str(" cycles");
+	log_Int("		 ", cycle_5);
+	log_Str(" cycles");
+	log_Str("\r\n");
+	
+	//log_Str("");
+	log_Float("	", time_1);
+	log_Str(" ns");
+	log_Float("	", time_2);
+	log_Str(" ns");
+	log_Float("		", time_3);
+	log_Str(" ns");
+	log_Float("	", time_4);
+	log_Str(" ns");
+	log_Float("		", time_5);
+	log_Str(" ns");
+	log_Str("\r\n");
+	
+	free(source);
+}
+
+void Profile_Send(void){
+	
+	uint8_t n;
+	int32_t cycle_avg=0;
+	int32_t cycle=0;
+	float time=0.0;
+	Cmds command = 0x03;
+	uint8_t data[3]={0x01,0x01,0x01};
+	for(n=0;n<3;n++){
+		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+		send_ST_Msg(&command, data, 3);
+		cycle += PIT_CVAL0;
+		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+		
+		cycle += (num_pit_overflow*240);
+		cycle_avg += cycle;
+			
+		num_pit_overflow=0;
+		cycle=0;
+	}
+	cycle_avg /= 3;
+	time = cycle_avg * TIME_PER_CYCLE;
+
+	log_Str("\r\n");
+	log_Float("Time to transmit the ST_Msg message: ", time);
+	log_Str(" ns\r\n");
+	cycle_avg = 0;
+	time=0.0;
+}
 
 void time_Profiler_Memmove(int32_t bytes){
 	uint8_t *source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
@@ -757,10 +1063,19 @@ void time_Profiler_Printf(){
 #endif
 
 void time_Profiler(){
-	time_Profiler_Memmove(10);			
-	time_Profiler_Memmove(100);
-	time_Profiler_Memmove(1000);
-	time_Profiler_Memmove(5000);
+	Profile_Send();
+	//Profiling_Memmove(10);
+	//Profiling_Memmove(100);
+	//Profiling_Memmove(1000);
+	//Profiling_Memmove(2000);
+	//Profiling_Memset(10);
+	//Profiling_Memset(100);
+	//Profiling_Memset(1000);
+	//Profiling_Memset(2000);
+	//time_Profiler_Memmove(10);			
+	//time_Profiler_Memmove(100);
+	//time_Profiler_Memmove(1000);
+	//time_Profiler_Memmove(5000);
 	/*time_Profiler_Memset(10);
 	time_Profiler_Memset(100);
 	time_Profiler_Memset(500);

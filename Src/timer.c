@@ -8,9 +8,9 @@
  *****************************************************************************/
 #include "includes.h"
 
-#define TPM_MODULE    1999
-#define TPM_INIT_VAL   20
-#define TPM_Cn_MODE  (TPM_CnSC_MSB_MASK | TPM_CnSC_ELSA_MASK)
+#define TPM_MODULE    (100)
+#define TPM_INIT_VAL  (100)
+#define TPM_Cn_MODE   (TPM_CnSC_MSB_MASK | TPM_CnSC_ELSA_MASK)
 
 void tpm_Init(void) 
 {       
@@ -43,7 +43,7 @@ void pit_Init(void){
     SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;          	/* Enable clock gate to the PIT module  */
     PIT_MCR &= ~(1 << PIT_MCR_MDIS_SHIFT);    	/* Enable clock for standard PIT timer */
     PIT_MCR |= PIT_MCR_FRZ_MASK;
-	PIT_LDVAL0 = 240;                     	 	/* Initial value for 10us period  */
+	PIT_LDVAL0 = 24;                     	 	/* Initial value for 1us period  */
     PIT_TFLG0 |= PIT_TFLG_TIF_MASK;           	/* Clear Timer Interrupt Flag  */
     PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;         	/* Enable Timer Interrupt   */
 	NVIC_EnableIRQ(PIT_IRQn);   													

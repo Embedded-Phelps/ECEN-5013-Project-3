@@ -27,12 +27,13 @@
 * @return:SUCCESS/ERROR 
 */
 int8_t my_memmove(uint8_t *src, uint8_t *dst, int32_t length);
+int8_t my_memmove_word(uint8_t * src, uint8_t * dst, int32_t length);
 
-/****************************************************
-* @name: dma_memmove
+/***************************************************************************
+* @name: dma_memmove / dma_memmove_word
 *
-* @description: copy data from one memory to the other using DMA
-*               for KL25Z only
+* @description: copy data from one memory to the other using KL25Z DMA
+*               _word moves data in words instead of bytes
 *               
 * @param: src -- pointer to the source address
 *         dst -- pointer to the destination address
@@ -42,6 +43,7 @@ int8_t my_memmove(uint8_t *src, uint8_t *dst, int32_t length);
 * @return:SUCCESS/ERROR 
 */
 int8_t dma_memmove(uint8_t * src, uint8_t * dst, uint32_t length, uint8_t ch);
+int8_t dma_memmove_word(uint8_t * src, uint8_t * dst, uint32_t length, uint8_t ch);
 
 /****************************************************
 * @name: my_memzero
@@ -54,7 +56,7 @@ int8_t dma_memmove(uint8_t * src, uint8_t * dst, uint32_t length, uint8_t ch);
 * @return:SUCCESS/ERROR 
 */
 int8_t my_memzero(uint8_t *src, uint32_t length);
-
+int8_t my_memzero_word(uint8_t *src, uint32_t length);
 /****************************************************
 * @name: dma_memzero
 *
@@ -68,7 +70,7 @@ int8_t my_memzero(uint8_t *src, uint32_t length);
 * @return:SUCCESS/ERROR 
 */
 int8_t dma_memzero(uint8_t * src, uint32_t length, uint8_t ch);
-
+int8_t dma_memzero_word(uint8_t * src, uint32_t length, uint8_t ch);
 /****************************************************
 * @name: my_reverse
 *

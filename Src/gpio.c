@@ -37,10 +37,10 @@ void spi_Gpio_Init(void)
 	FGPIOC_PSOR|= 1<<12;
 	FGPIOC_PDDR|= 1<<12;
 	
-	/* Set PTC4 pin to SPI0 CS0 function */
+	/* Set PTC4 pin to SPI0 CS0 function, disabled in this application */
 	//PORTC_PCR4 |= PORT_PCR_MUX(2);									
-	//FGPIOC_PSOR |= 1<<4;												/* Set CS0 */
-	//FGPIOC_PDDR |= 1<<4;												/* Set CS0 as output */
+	//FGPIOC_PSOR |= 1<<4;						/* Set CS0 */
+	//FGPIOC_PDDR |= 1<<4;						/* Set CS0 as output */
 }
 
 void nrf_Gpio_Init(void)

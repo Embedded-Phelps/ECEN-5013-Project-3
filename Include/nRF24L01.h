@@ -1,3 +1,18 @@
+/***************************************************************************
+ *
+ *	Filename: 		nRF24L01.h
+ *  Description:  	nRF24L01 driver function prototype header file
+ *  Author: 		ShuTing Guo  
+ *  Date: 			Oct. 2016
+ *
+ *****************************************************************************/
+#ifndef __NRF24L01_H
+#define __NRF24L01_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "includes.h"
 
 #define ADR_WIDTH	(5)			// 5 bytes TX(RX) address width
@@ -7,7 +22,7 @@
 // nRF24L01 Register Map
 *******************************************************************/
 #define CONFIG			(0x00)		// Configuration Register
-#define EN_AA				(0x01)
+#define EN_AA			(0x01)
 #define EN_RXADDR		(0x02)		// Enabled RX Addresses Register
 #define SETUP_AW		(0x03)		// Setup of Address Widths Register
 #define SETUP_RETR		(0x04)		// Setup of Automatic Retransmission Register
@@ -61,19 +76,86 @@
 
 #define NRF_ENABLE		(FGPIOC_PSOR |= (1<<13))
 #define NRF_DISABLE		(FGPIOC_PCOR |= (1<<13))
-#define NRF_IRQ				(FGPIOC_PDIR & (1<<16)) 
+#define NRF_IRQ			(FGPIOC_PDIR & (1<<16)) 
 
 /******************************************************************
 // nRF24L01 Control Functions
 *******************************************************************/
+
+/*********************************************************************
+* @name: nrf_Init
+*
+* @description: Initialize the NRF24L01 module: configure pins,
+*				initialize spi interface for communication 
+*/
 void nrf_Init(void);
+
+/*********************************************************************
+* @name: nrf_Write_Reg
+*
+* @description: write to a register of the NRF24L01
+*               
+* @param: reg -- target register
+*		  value -- value to write to the target register
+*         
+* @return: value of the STATUS register
+*/
+uint8_t nrf_Write_Reg(uint8_t reg, uint8_t value);
+
+/*********************************************************************
+* @name: nrf_Read_Reg
+*
+* @description: read from a register of the NRF24L01
+*               
+* @param: reg -- target register to read from
+*         
+* @return: value of the register
+*/
+uint8_t nrf_Read_Reg(uint8_t reg);
+
+/*********************************************************************
+* @name: nrf_Write_Buf
+*
+* @description: write bytes of data to a register of the NRF24L01
+*               
+* @param: reg -- target register to write to
+*         tx_Data_Buffer -- data to send
+*		  bytes -- number of bytes 
+*
+* @return: value of the STATUS register
+*/
+uint8_t nrf_Write_Buf(uint8_t reg, uint8_t *tx_Data_Buffer, uint8_t bytes);
+
+/*********************************************************************
+* @name: nrf_Read_Buf
+*
+* @description: read bytes of data from a register of the NRF24L01
+*               
+* @param: reg -- target register to read from
+*         rx_Data_Buffer -- storing read data
+*		  bytes -- number of bytes 
+*
+* @return: value of the STATUS register
+*/
+uint8_t nrf_Read_Buf(uint8_t reg, uint8_t *rx_Data_Buffer, uint8_t bytes);
+
+/*********************************************************************
+* @name: nrf_Check
+*
+* @description: check if the NRF24L01 module is connected
+*               
+* @return: NRF_UNDETECTED / NRF_DETECTED
+*/
+uint8_t nrf_Check(void);
+
 void nrf_RxMode(void);
 void nrf_TxMode(void);
-uint8_t nrf_Write_Reg(uint8_t reg, uint8_t value);
-uint8_t nrf_Read_Reg(uint8_t reg);
-uint8_t nrf_Write_Buf(uint8_t reg, uint8_t *tx_Data_Buffer, uint8_t bytes);
-uint8_t nrf_Read_Buf(uint8_t reg, uint8_t *rx_Data_Buffer, uint8_t bytes);
-uint8_t nrf_Check(void);
 uint8_t nrf_TxPacket(uint8_t *data);
 uint8_t nrf_RxPacket(uint8_t *data);
 
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif
